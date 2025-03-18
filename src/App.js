@@ -1,25 +1,49 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import AuthRoute from "./modules/auth/routes/AuthRoute";
+import Login from "./modules/auth/components/login/Login";
+import Layout from "./layout/layout/Layout";
+import Sales from "./modules/sales/Sales";
+import SaleOrder from "./modules/sales/sale-order/SaleOrder";
 
-function App() {
+const App = () => {
+  debugger;
+  const isAuthenticated = !!sessionStorage.getItem("authToken");
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+      {/* Public Route for Login */}
+      <Route path="/auth/login" element={<Login />} />
+
+      {/* Default Route: Redirect to /sales if authenticated, else to /auth/login */}
+      <Route
+        path="/"
+        element={
+          <Navigate to={isAuthenticated ? "/sales" : "/auth/login"} replace />
+        }
+      />
+
+      {/* Protected Routes */}
+      <Route
+        element={
+          <AuthRoute>
+            <Layout />
+          </AuthRoute>
+        }
+      >
+        <Route path="/sales" element={<Sales />} />
+        <Route path="/sales/orders/sale-order" element={<SaleOrder />} />
+      </Route>
+
+      {/* Catch-all Route: Redirect to /sales or /auth/login */}
+      <Route
+        path="*"
+        element={
+          <Navigate to={isAuthenticated ? "/sales" : "/auth/login"} replace />
+        }
+      />
+    </Routes>
   );
-}
+};
 
 export default App;

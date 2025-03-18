@@ -1,0 +1,80 @@
+/* TopNavbar.css */
+.top-navbar {
+  background-color: #34495e;
+  color: white;
+  padding: 10px 20px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-start;
+  transition: left 0.3s ease;
+  height: 60px; /* Fixed height for consistency */
+}
+
+.top-navbar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 20px;
+  align-items: center; /* Align items vertically */
+}
+
+.top-navbar-menu li {
+  position: relative;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.submenu {
+  list-style: none;
+  padding: 10px 0;
+  margin: 0;
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #2c3e50;
+  min-width: 200px;
+  z-index: 1000;
+}
+
+.top-navbar-menu li:hover .submenu {
+  display: block;
+}
+
+.submenu li a {
+  color: white;
+  text-decoration: none;
+  display: block;
+  padding: 10px 20px;
+}
+
+.submenu li a:hover {
+  background-color: #34495e;
+}
+
+.arrow {
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  display: inline-block;
+  padding: 3px;
+  transform: rotate(45deg);
+  transition: transform 0.3s ease;
+}
+
+.arrow.open {
+  transform: rotate(-135deg);
+}
+
+.placeholder-item {
+  color: rgba(255, 255, 255, 0.5); /* Light gray text for placeholder */
+  font-style: italic; /* Optional: Italicize placeholder text */
+}
