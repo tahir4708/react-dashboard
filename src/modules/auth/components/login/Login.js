@@ -9,7 +9,7 @@ const Login = () => {
   const handleLogin = () => {
     // Simulate login logic
     sessionStorage.setItem("authToken", "dummy-token");
-    navigate("/sales");
+    navigate("/dashboard");
   };
 
   return (

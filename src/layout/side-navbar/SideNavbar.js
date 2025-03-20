@@ -7,7 +7,7 @@ const menuData = [
   {
     id: 1,
     title: "Home",
-    path: "/",
+    path: "/dashboard",
     icon: <FaHome />,
     children: [],
   },
