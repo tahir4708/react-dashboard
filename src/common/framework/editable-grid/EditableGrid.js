@@ -1,124 +1,161 @@
 ﻿import React, { useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./EditableGrid.css";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  TextField,
+  Select,
+  MenuItem,
+  Checkbox,
+  FormControl,
+  InputLabel,
+  Typography,
+  Box,
+} from "@mui/material";
+import SaveIcon from "@mui/icons-material/Save";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
 
 const Dropdown = ({ options, value, onChange }) => {
-    return (
-        <select className="form-control" value={value} onChange={(e) => onChange(e.target.value)}>
-            <option value="">Select</option>
-            {options.map((option) => (
-                <option key={option.key} value={option.key}>
-                    {option.value}
-                </option>
-            ))}
-        </select>
-    );
+  return (
+    <FormControl fullWidth variant="outlined" size="small">
+      <InputLabel>Select</InputLabel>
+      <Select value={value} onChange={(e) => onChange(e.target.value)} label="Select">
+        <MenuItem value="">
+          <em>Select</em>
+        </MenuItem>
+        {options.map((option) => (
+          <MenuItem key={option.key} value={option.key}>
+            {option.value}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  );
 };
 
 const EditableGrid = ({ initialData, columns, onSave, maxHeight = "400px" }) => {
-    const [items, setItems] = useState(initialData);
-    const [nextId, setNextId] = useState(initialData.length + 1);
+  const [items, setItems] = useState(initialData);
+  const [nextId, setNextId] = useState(initialData.length + 1);
 
-    const handleAddRow = () => {
-        const newItem = columns.reduce((acc, column) => {
-            acc[column.key] = column.defaultValue || "";
-            return acc;
-        }, { id: nextId });
+  const handleAddRow = () => {
+    const newItem = columns.reduce((acc, column) => {
+      acc[column.key] = column.defaultValue || "";
+      return acc;
+    }, { id: nextId });
 
-        setItems([...items, newItem]);
-        setNextId(nextId + 1);
-    };
+    setItems([...items, newItem]);
+    setNextId(nextId + 1);
+  };
 
-    const handleDelete = (id) => {
-        setItems(items.filter((item) => item.id !== id));
-    };
+  const handleDelete = (id) => {
+    setItems(items.filter((item) => item.id !== id));
+  };
 
-    const handleChange = (id, field, value) => {
-        const updatedItems = items.map((item) => {
-            if (item.id === id) {
-                return { ...item, [field]: value };
-            }
-            return item;
-        });
-        setItems(updatedItems);
-    };
+  const handleChange = (id, field, value) => {
+    const updatedItems = items.map((item) => {
+      if (item.id === id) {
+        return { ...item, [field]: value };
+      }
+      return item;
+    });
+    setItems(updatedItems);
+  };
 
-    return (
-        <div className="editable-grid-container">
-            <div className="d-flex justify-content-between align-items-center mb-3">
-                <h4 className="text-primary">Editable Grid</h4>
-                <button className="btn btn-success" onClick={handleAddRow}>
-                    <i className="bi bi-plus-lg"></i> Add Row
-                </button>
-            </div>
+  return (
+    <Box sx={{ padding: 2 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
+        <Typography variant="h5" color="primary">
+          Editable Grid
+        </Typography>
+        <Button variant="contained" color="success" onClick={handleAddRow} startIcon={<AddIcon />}>
+          Add Row
+        </Button>
+      </Box>
 
-            {/* Scrollable Table Container */}
-            <div className="table-container" style={{ maxHeight, overflowY: "auto" }}>
-                <table className="table table-bordered table-hover">
-                    <thead className="table-dark">
-                    <tr>
-                        {columns.map((column) => (
-                            <th key={column.key} className={`text-center ${column.align || ""}`}>
-                                {column.label}
-                            </th>
-                        ))}
-                        <th className="text-center">Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {items.map((item) => (
-                        <tr key={item.id}>
-                            {columns.map((column) => (
-                                <td key={column.key} className={`${column.align || ""}`}>
-                                    {column.render ? (
-                                        column.render(item, (value) => handleChange(item.id, column.key, value))
-                                    ) : column.type === "dropdown" ? (
-                                        <Dropdown
-                                            options={column.options}
-                                            value={item[column.key]}
-                                            onChange={(val) => handleChange(item.id, column.key, val)}
-                                        />
-                                    ) : column.type === "checkbox" ? (
-                                        <input
-                                            type="checkbox"
-                                            checked={Boolean(item[column.key])}
-                                            onChange={(e) => handleChange(item.id, column.key, e.target.checked)}
-                                        />
-                                    ) : column.type === "radio" ? (
-                                        <input
-                                            type="radio"
-                                            name={column.key}
-                                            checked={Boolean(item[column.key])}
-                                            onChange={(e) => handleChange(item.id, column.key, e.target.checked)}
-                                        />
-                                    ) : (
-                                        <input
-                                            type={column.type || "text"}
-                                            value={item[column.key]}
-                                            onChange={(e) => handleChange(item.id, column.key, e.target.value)}
-                                            className="form-control"
-                                        />
-                                    )}
-                                </td>
-                            ))}
-                            <td className="text-center">
-                                <button onClick={() => handleDelete(item.id)} className="btn btn-danger btn-sm">
-                                    <i className="bi bi-trash"></i> Delete
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-            </div>
+      {/* Scrollable Table Container */}
+      <TableContainer component={Paper} sx={{ maxHeight, overflowY: "auto" }}>
+        <Table stickyHeader>
+          <TableHead>
+            <TableRow>
+              {columns.map((column) => (
+                <TableCell key={column.key} align={column.align || "left"}>
+                  {column.label}
+                </TableCell>
+              ))}
+              <TableCell align="center">Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {items.map((item) => (
+              <TableRow key={item.id}>
+                {columns.map((column) => (
+                  <TableCell key={column.key} align={column.align || "left"}>
+                    {column.render ? (
+                      column.render(item, (value) => handleChange(item.id, column.key, value))
+                    ) : column.type === "dropdown" ? (
+                      <Dropdown
+                        options={column.options}
+                        value={item[column.key]}
+                        onChange={(val) => handleChange(item.id, column.key, val)}
+                      />
+                    ) : column.type === "checkbox" ? (
+                      <Checkbox
+                        checked={Boolean(item[column.key])}
+                        onChange={(e) => handleChange(item.id, column.key, e.target.checked)}
+                      />
+                    ) : column.type === "radio" ? (
+                      <Checkbox
+                        checked={Boolean(item[column.key])}
+                        onChange={(e) => handleChange(item.id, column.key, e.target.checked)}
+                        color="primary"
+                      />
+                    ) : (
+                      <TextField
+                        type={column.type || "text"}
+                        value={item[column.key]}
+                        onChange={(e) => handleChange(item.id, column.key, e.target.value)}
+                        variant="outlined"
+                        size="small"
+                        fullWidth
+                      />
+                    )}
+                  </TableCell>
+                ))}
+                <TableCell align="center">
+                  <Button
+                    variant="contained"
+                    color="error"
+                    size="small"
+                    onClick={() => handleDelete(item.id)}
+                    startIcon={<DeleteIcon />}
+                  >
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-            <div className="text-end mt-2">
-                <button onClick={() => onSave(items)} className="btn btn-primary">
-                    <i className="bi bi-save"></i> Save
-                </button>
-            </div>
-        </div>
-    );
+      <Box sx={{ display: "flex", justifyContent: "flex-end", marginTop: 2 }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => onSave(items)}
+          startIcon={<SaveIcon />}
+        >
+          Save
+        </Button>
+      </Box>
+    </Box>
+  );
 };
 
 export default EditableGrid;

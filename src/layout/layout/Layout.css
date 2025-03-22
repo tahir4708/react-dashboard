@@ -32,3 +32,14 @@
 .sidebar:not(.open) ~ .main-content .page-content {
   margin-left: 60px; /* Adjust margin when sidebar is collapsed */
 }
+
+
+.content-area {
+  margin-left: 200px; /* Adjust based on the width of the side navbar */
+  padding: 20px;
+  transition: margin-left 0.3s;
+}
+
+.content-area.collapsed {
+  margin-left: 60px; /* Adjust based on the collapsed width of the side navbar */
+}

@@ -1,7 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "../../../../common/css/global.css"; // Import global CSS
-import "./Login.css"; // Import component-specific CSS
+import {
+  Box,
+  Button,
+  Container,
+  TextField,
+  Typography,
+  Paper,
+} from "@mui/material";
+import "../../../../common/css/global.css"; // Import global CSS (if needed)
 
 const Login = () => {
   const navigate = useNavigate();
@@ -13,36 +20,63 @@ const Login = () => {
   };
 
   return (
-    <div className="gradient-background">
-      <div className="white-container">
-        <h1 className="login-heading">Login</h1>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #6a11cb, #2575fc)", // Gradient background
+      }}
+    >
+      <Paper
+        elevation={3}
+        sx={{
+          padding: "2rem",
+          borderRadius: "8px",
+          backgroundColor: "white",
+          width: "100%",
+          maxWidth: "400px",
+        }}
+      >
+        <Typography variant="h4" component="h1" align="center" gutterBottom>
+          Login
+        </Typography>
         <form>
-          <div className="mb-3">
-            <input
+          <Box sx={{ marginBottom: "1.5rem" }}>
+            <TextField
+              fullWidth
               type="email"
-              className="form-control"
-              placeholder="Email"
+              label="Email"
+              variant="outlined"
               required
             />
-          </div>
-          <div className="mb-3">
-            <input
+          </Box>
+          <Box sx={{ marginBottom: "1.5rem" }}>
+            <TextField
+              fullWidth
               type="password"
-              className="form-control"
-              placeholder="Password"
+              label="Password"
+              variant="outlined"
               required
             />
-          </div>
-          <button
-            type="button"
-            className="custom-btn" // Reusable button class
+          </Box>
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
             onClick={handleLogin}
+            sx={{
+              padding: "0.75rem",
+              fontSize: "1rem",
+              fontWeight: "bold",
+            }}
           >
             Login
-          </button>
+          </Button>
         </form>
-      </div>
-    </div>
+      </Paper>
+    </Box>
   );
 };
 

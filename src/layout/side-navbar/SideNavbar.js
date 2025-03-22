@@ -1,7 +1,17 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom"; // Use Link from react-router-dom
+import { Link } from "react-router-dom";
 import { FaHome, FaChartLine, FaInfoCircle, FaCog } from "react-icons/fa";
-import "./SideNavbar.css";
+import {
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+  Box,
+  Divider,
+  useTheme,
+} from "@mui/material";
 
 const menuData = [
   {
@@ -32,7 +42,7 @@ const menuData = [
           {
             id: 212,
             title: "Sale Order",
-            path: "/sales/orders/sale-order", // Route for Sale Order
+            path: "/sales/orders/sale-order",
             icon: <FaChartLine />,
           },
         ],
@@ -95,6 +105,7 @@ const menuData = [
 
 const SideNavbar = ({ onMenuSelect, isAuthenticated, onSidebarToggle }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const theme = useTheme(); // Access the current theme
 
   const handleSidebarHover = (open) => {
     setIsSidebarOpen(open);
@@ -106,31 +117,75 @@ const SideNavbar = ({ onMenuSelect, isAuthenticated, onSidebarToggle }) => {
     onMenuSelect(menu);
   };
 
+  // Determine icon color based on background
+  const iconColor = theme.palette.mode === "dark" ? "white" : "black";
+
   return (
-    <div
-      className={`sidebar ${isSidebarOpen ? "open" : ""}`}
+    <Drawer
+      variant="permanent"
+      sx={{
+        width: isSidebarOpen ? 240 : 60,
+        flexShrink: 0,
+        "& .MuiDrawer-paper": {
+          width: isSidebarOpen ? 240 : 60,
+          boxSizing: "border-box",
+          transition: "width 0.3s ease",
+          backgroundColor: theme.palette.background.paper, // Use theme background
+        },
+      }}
       onMouseEnter={() => handleSidebarHover(true)}
       onMouseLeave={() => handleSidebarHover(false)}
     >
-      <div className="sidebar-header">
-        <h3>{isSidebarOpen ? "My App" : <FaHome />}</h3>
-      </div>
-      <ul className="sidebar-menu">
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "16px",
+        }}
+      >
+        <Typography variant="h6" noWrap sx={{ color: iconColor }}>
+          {isSidebarOpen ? "My App" : <FaHome />}
+        </Typography>
+      </Box>
+      <Divider />
+      <List>
         {menuData.map((menu) => (
-          <li key={menu.id} onClick={(e) => handleMenuClick(menu, e)}>
-            <Link to={menu.path}>
-              {isSidebarOpen ? (
-                <>
-                  {menu.icon} {menu.title}
-                </>
-              ) : (
-                menu.icon
-              )}
-            </Link>
-          </li>
+          <ListItem
+            key={menu.id}
+            button
+            component={Link}
+            to={menu.path}
+            onClick={(e) => handleMenuClick(menu, e)}
+            sx={{
+              paddingLeft: isSidebarOpen ? "24px" : "16px", // Adjust padding for symmetry
+              paddingRight: isSidebarOpen ? "24px" : "16px", // Adjust padding for symmetry
+              "&:hover": {
+                background:
+                  theme.palette.mode === "dark"
+                    ? "linear-gradient(90deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))"
+                    : "linear-gradient(90deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.05))",
+              },
+            }}
+          >
+            <ListItemIcon
+              sx={{
+                color: iconColor,
+                minWidth: isSidebarOpen ? "40px" : "auto", // Adjust icon spacing
+              }}
+            >
+              {menu.icon}
+            </ListItemIcon>
+            {isSidebarOpen && (
+              <ListItemText
+                primary={menu.title}
+                sx={{ color: iconColor, marginLeft: isSidebarOpen ? "8px" : "0" }} // Adjust text spacing
+              />
+            )}
+          </ListItem>
         ))}
-      </ul>
-    </div>
+      </List>
+    </Drawer>
   );
 };
 
