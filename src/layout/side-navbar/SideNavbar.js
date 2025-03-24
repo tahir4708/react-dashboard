@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FaHome, FaChartLine, FaInfoCircle, FaCog, FaSalesforce } from "react-icons/fa";
+import { FaHome } from "react-icons/fa";
 import {
   Drawer,
   List,
@@ -11,18 +11,28 @@ import {
   Box,
   Divider,
   useTheme,
+  IconButton,
 } from "@mui/material";
-import {menuData} from "../menuData";
+import { ChevronLeft, Menu } from "@mui/icons-material";
+import { menuData } from "../menuData";
 
-
-const SideNavbar = ({ isAuthenticated, onSidebarToggle }) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+const SideNavbar = ({
+                      isAuthenticated,
+                      isSidebarOpen,
+                      onSidebarToggle,
+                      isMobile,
+                    }) => {
   const theme = useTheme();
   const location = useLocation();
 
   const handleSidebarHover = (open) => {
-    setIsSidebarOpen(open);
-    onSidebarToggle(open);
+    if (!isMobile) {
+      onSidebarToggle(open);
+    }
+  };
+
+  const handleSidebarToggle = () => {
+    onSidebarToggle(!isSidebarOpen);
   };
 
   const iconColor = theme.palette.mode === "dark" ? "white" : "black";
@@ -31,12 +41,11 @@ const SideNavbar = ({ isAuthenticated, onSidebarToggle }) => {
   const isMenuActive = (menu) => {
     if (location.pathname === menu.path) return true;
     if (menu.children) {
-      return menu.children.some(child => {
-        debugger;
+      return menu.children.some((child) => {
         if (location.pathname === child.path) return true;
         if (child.children) {
-          return child.children.some(grandChild =>
-              location.pathname === grandChild.path
+          return child.children.some(
+              (grandChild) => location.pathname === grandChild.path
           );
         }
         return false;
@@ -47,24 +56,56 @@ const SideNavbar = ({ isAuthenticated, onSidebarToggle }) => {
 
   return (
       <Drawer
-          variant="permanent"
+          variant={isMobile ? "temporary" : "permanent"}
+          open={isSidebarOpen}
+          onClose={handleSidebarToggle}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile
+          }}
           sx={{
             width: isSidebarOpen ? 240 : 60,
             flexShrink: 0,
             "& .MuiDrawer-paper": {
               width: isSidebarOpen ? 240 : 60,
               boxSizing: "border-box",
-              transition: "width 0.3s ease",
+              transition: theme.transitions.create("width", {
+                easing: theme.transitions.easing.sharp,
+                duration: isMobile
+                    ? theme.transitions.duration.leavingScreen
+                    : theme.transitions.duration.enteringScreen,
+              }),
               backgroundColor: theme.palette.background.default,
+              [theme.breakpoints.down("md")]: {
+                position: "fixed",
+                zIndex: theme.zIndex.drawer + 1,
+              },
             },
           }}
           onMouseEnter={() => handleSidebarHover(true)}
           onMouseLeave={() => handleSidebarHover(false)}
       >
-        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", p: 2 }}>
+        <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              p: 2,
+            }}
+        >
           <Typography variant="h6" noWrap sx={{ color: iconColor }}>
-            {isSidebarOpen ? <><FaHome /> IMS Store</> : <FaHome />}
+            {isSidebarOpen ? (
+                <>
+                  <FaHome /> IMS Store
+                </>
+            ) : (
+                <FaHome />
+            )}
           </Typography>
+          {isMobile && isSidebarOpen && (
+              <IconButton onClick={handleSidebarToggle} sx={{ color: iconColor }}>
+                <ChevronLeft />
+              </IconButton>
+          )}
         </Box>
         <Divider />
         <List>
@@ -93,7 +134,9 @@ const SideNavbar = ({ isAuthenticated, onSidebarToggle }) => {
                     },
                   }}
               >
-                <ListItemIcon sx={{ color: iconColor, minWidth: isSidebarOpen ? "40px" : "auto" }}>
+                <ListItemIcon
+                    sx={{ color: iconColor, minWidth: isSidebarOpen ? "40px" : "auto" }}
+                >
                   {menu.icon}
                 </ListItemIcon>
                 {isSidebarOpen && (
@@ -103,8 +146,8 @@ const SideNavbar = ({ isAuthenticated, onSidebarToggle }) => {
                           color: iconColor,
                           ml: 1,
                           "& .MuiTypography-root": {
-                            fontWeight: isMenuActive(menu) ? "bold" : "normal"
-                          }
+                            fontWeight: isMenuActive(menu) ? "bold" : "normal",
+                          },
                         }}
                     />
                 )}

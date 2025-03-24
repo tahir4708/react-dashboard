@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { FaChartLine, FaInfoCircle, FaCog, FaSignOutAlt } from "react-icons/fa";
+import { FaSignOutAlt } from "react-icons/fa";
 import {
     AppBar,
     Toolbar,
@@ -12,10 +12,12 @@ import {
     Typography,
     Box,
     useTheme,
+    Button,
 } from "@mui/material";
+import { Menu as MenuIcon } from "@mui/icons-material";
 import AuthService from "../../modules/auth/services/AuthService";
 
-const TopNavbar = ({ selectedMenu, isSidebarOpen }) => {
+const TopNavbar = ({ selectedMenu, isSidebarOpen, toggleSidebar, isMobile }) => {
     const [openDropdownId, setOpenDropdownId] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const theme = useTheme();
@@ -34,7 +36,7 @@ const TopNavbar = ({ selectedMenu, isSidebarOpen }) => {
 
     const handleLogout = () => {
         AuthService.logout();
-        window.location.reload(); // Temporary solution until you integrate navigation
+        window.location.reload();
     };
 
     const renderMenu = (menu) => {
@@ -88,7 +90,8 @@ const TopNavbar = ({ selectedMenu, isSidebarOpen }) => {
                         sx={{
                             marginTop: "8px",
                             "& .MuiPaper-root": {
-                                backgroundColor: theme.palette.mode === "dark" ? "#333" : "#f9f9f9",
+                                backgroundColor:
+                                    theme.palette.mode === "dark" ? "#333" : "#f9f9f9",
                                 boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
                                 borderRadius: "4px",
                             },
@@ -105,48 +108,85 @@ const TopNavbar = ({ selectedMenu, isSidebarOpen }) => {
         <AppBar
             position="fixed"
             sx={{
-                left: isSidebarOpen ? "240px" : "60px",
-                width: `calc(100% - ${isSidebarOpen ? "240px" : "60px"})`,
-                transition: "left 0.3s, width 0.3s",
-                backgroundColor: theme.palette.mode === "dark" ? "#1e1e1e" : "#ffffff",
+                left: isMobile ? 0 : isSidebarOpen ? "240px" : "60px",
+                width: isMobile
+                    ? "100%"
+                    : `calc(100% - ${isSidebarOpen ? "240px" : "60px"})`,
+                transition: theme.transitions.create(["left", "width"], {
+                    easing: theme.transitions.easing.sharp,
+                    duration: theme.transitions.duration.leavingScreen,
+                }),
+                backgroundColor:
+                    theme.palette.mode === "dark" ? "#1e1e1e" : "#ffffff",
                 boxShadow: "none",
                 borderBottom: `1px solid ${theme.palette.divider}`,
             }}
         >
-            <Toolbar sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                paddingRight: "16px" // Ensure consistent padding
-            }}>
-                <Box sx={{
+            <Toolbar
+                sx={{
                     display: "flex",
-                    alignItems: "center",
-                    gap: 2,
-                    width: "100%", // Take up available space
-                    overflow: "hidden" // Prevent overflow
-                }}>
+                    justifyContent: "space-between",
+                    paddingRight: "16px",
+                }}
+            >
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        width: "100%",
+                        overflow: "hidden",
+                    }}
+                >
+                    {isMobile && (
+                        <Button
+                            startIcon={<MenuIcon />}
+                            onClick={toggleSidebar}
+                            sx={{
+                                minWidth: 'auto',
+                                padding: '8px',
+                                borderRadius: '4px',
+                                color: textColor,
+                                backgroundColor: theme.palette.mode === 'dark' ?
+                                    'rgba(255,255,255,0.89)' :
+                                    'rgba(0, 0, 0, 0.1)',
+                                '&:hover': {
+                                    backgroundColor: theme.palette.mode === 'dark' ?
+                                        'rgba(255,255,255,0.89)' :
+                                        'rgba(0, 0, 0, 0.2)',
+                                },
+                                mr: 2,
+                            }}
+                        >
+
+                        </Button>
+                    )}
                     {selectedMenu?.children?.length > 0 && (
-                        <Box sx={{
-                            display: "flex",
-                            ml: 2,
-                            flexGrow: 1 // Allow this to grow and push logout button to the right
-                        }}>
+                        <Box
+                            sx={{
+                                display: "flex",
+                                ml: isMobile ? 0 : 2,
+                                flexGrow: 1,
+                                overflowX: "auto",
+                                scrollbarWidth: "none",
+                                "&::-webkit-scrollbar": {
+                                    display: "none",
+                                },
+                            }}
+                        >
                             {selectedMenu.children.map((child) => renderMenu(child))}
                         </Box>
                     )}
                 </Box>
 
-                <Box sx={{
-                    flexShrink: 0, // Prevent shrinking
-                    marginLeft: "auto" // Push to the far right
-                }}>
+                <Box sx={{ flexShrink: 0, marginLeft: "auto" }}>
                     <IconButton
                         onClick={handleLogout}
                         sx={{
                             color: textColor,
                             "&:hover": {
-                                backgroundColor: theme.palette.action.hover
-                            }
+                                backgroundColor: theme.palette.action.hover,
+                            },
                         }}
                     >
                         <FaSignOutAlt size={20} />
