@@ -24,11 +24,15 @@ const GridView = ({
                       onDelete,
                       tableWidth = "100%",
                       tableHeight = "500px",
+                      defaultPageSize = 10, // Added default page size
                   }) => {
     const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize] = useState(defaultPageSize); // Now using the prop
     const [searchTerm, setSearchTerm] = useState("");
     const [filters, setFilters] = useState({});
+
+    // Calculate total pages ensuring at least 1 page
+    const totalPages = Math.max(1, Math.ceil(totalRecords / pageSize));
 
     // Handle page change
     const handlePageChange = (event, page) => {
@@ -50,9 +54,6 @@ const GridView = ({
         onFilter(newFilters);
     };
 
-    // Calculate total pages
-    const totalPages = Math.ceil(totalRecords / pageSize);
-
     return (
         <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
             {/* Search Input */}
@@ -71,6 +72,7 @@ const GridView = ({
                 sx={{
                     maxHeight: tableHeight,
                     overflow: "auto",
+                    flexGrow: 1, // Takes available space
                 }}
             >
                 <Table stickyHeader sx={{ width: tableWidth }}>
@@ -93,39 +95,59 @@ const GridView = ({
                                     )}
                                 </TableCell>
                             ))}
-                            <TableCell sx={{ fontWeight: "bold", width: "120px" }}>
-                                Actions
-                            </TableCell>
+                            {(onEdit || onDelete) && (
+                                <TableCell sx={{ fontWeight: "bold", width: "120px" }}>
+                                    Actions
+                                </TableCell>
+                            )}
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {data.map((row, rowIndex) => (
-                            <TableRow key={rowIndex} hover>
-                                {columns.map((column) => (
-                                    <TableCell key={column.key}>{row[column.key]}</TableCell>
-                                ))}
-                                <TableCell>
-                                    <IconButton color="primary" onClick={() => onEdit(row)}>
-                                        <EditIcon />
-                                    </IconButton>
-                                    <IconButton color="error" onClick={() => onDelete(row)}>
-                                        <DeleteIcon />
-                                    </IconButton>
+                        {data.length > 0 ? (
+                            data.map((row, rowIndex) => (
+                                <TableRow key={rowIndex} hover>
+                                    {columns.map((column) => (
+                                        <TableCell key={column.key}>
+                                            {row[column.key]}
+                                        </TableCell>
+                                    ))}
+                                    {(onEdit || onDelete) && (
+                                        <TableCell>
+                                            {onEdit && (
+                                                <IconButton color="primary" onClick={() => onEdit(row)}>
+                                                    <EditIcon />
+                                                </IconButton>
+                                            )}
+                                            {onDelete && (
+                                                <IconButton color="error" onClick={() => onDelete(row)}>
+                                                    <DeleteIcon />
+                                                </IconButton>
+                                            )}
+                                        </TableCell>
+                                    )}
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={columns.length + 1} align="center">
+                                    No records found
                                 </TableCell>
                             </TableRow>
-                        ))}
+                        )}
                     </TableBody>
                 </Table>
             </TableContainer>
 
-            {/* Pagination */}
-            <Pagination
-                count={totalPages}
-                page={currentPage}
-                onChange={handlePageChange}
-                color="primary"
-                sx={{ mt: 2, alignSelf: "center" }}
-            />
+            {/* Pagination - Only show if we have more than one page */}
+            {totalPages > 1 && (
+                <Pagination
+                    count={totalPages}
+                    page={currentPage}
+                    onChange={handlePageChange}
+                    color="primary"
+                    sx={{ mt: 2, alignSelf: "center" }}
+                />
+            )}
         </div>
     );
 };
