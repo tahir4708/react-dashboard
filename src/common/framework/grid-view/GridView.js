@@ -1,7 +1,17 @@
 ﻿import React, { useState } from "react";
-import { FaEdit, FaTrash } from "react-icons/fa";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./GridView.css"; // Custom CSS for additional styling
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    TextField,
+    IconButton,
+    Pagination,
+} from "@mui/material";
+import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 
 const GridView = ({
                       columns,
@@ -12,8 +22,8 @@ const GridView = ({
                       onFilter,
                       onEdit,
                       onDelete,
-                      tableWidth = "100%", // Default table width
-                      tableHeight = "500px", // Default table height
+                      tableWidth = "100%",
+                      tableHeight = "500px",
                   }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
@@ -21,7 +31,7 @@ const GridView = ({
     const [filters, setFilters] = useState({});
 
     // Handle page change
-    const handlePageChange = (page) => {
+    const handlePageChange = (event, page) => {
         setCurrentPage(page);
         onPageChange(page, pageSize);
     };
@@ -44,102 +54,78 @@ const GridView = ({
     const totalPages = Math.ceil(totalRecords / pageSize);
 
     return (
-        <div className="grid-view-container">
+        <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
             {/* Search Input */}
-            <div className="search-container mb-3">
-                <input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchTerm}
-                    onChange={handleSearch}
-                    className="form-control"
-                />
-            </div>
+            <TextField
+                fullWidth
+                variant="outlined"
+                label="Search"
+                value={searchTerm}
+                onChange={handleSearch}
+                sx={{ mb: 2 }}
+            />
 
-            {/* Table with Horizontal and Vertical Scrolling */}
-            <div
-                className="table-responsive"
-                style={{ maxHeight: tableHeight, overflow: "auto" }}
+            {/* Table with Material-UI */}
+            <TableContainer
+                component={Paper}
+                sx={{
+                    maxHeight: tableHeight,
+                    overflow: "auto",
+                }}
             >
-                <table
-                    className="table table-bordered table-striped"
-                    style={{ width: tableWidth }}
-                >
-                    <thead>
-                    <tr>
-                        {columns.map((column) => (
-                            <th
-                                key={column.key}
-                                style={{ width: column.width || "auto" }} // Set column width
-                            >
-                                <div>{column.title}</div>
-                                {column.filterable && (
-                                    <input
-                                        type="text"
-                                        placeholder={`Filter ${column.title}`}
-                                        onChange={(e) =>
-                                            handleFilterChange(column.key, e.target.value)
-                                        }
-                                        className="form-control form-control-sm"
-                                    />
-                                )}
-                            </th>
-                        ))}
-                        <th style={{ width: "120px" }}>Actions</th> {/* Fixed width for Actions column */}
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {data.map((row, rowIndex) => (
-                        <tr key={rowIndex}>
+                <Table stickyHeader sx={{ width: tableWidth }}>
+                    <TableHead>
+                        <TableRow>
                             {columns.map((column) => (
-                                <td key={column.key} style={{ width: column.width || "auto" }}>
-                                    {row[column.key]}
-                                </td>
+                                <TableCell key={column.key} sx={{ fontWeight: "bold" }}>
+                                    {column.title}
+                                    {column.filterable && (
+                                        <TextField
+                                            variant="outlined"
+                                            size="small"
+                                            fullWidth
+                                            placeholder={`Filter ${column.title}`}
+                                            onChange={(e) =>
+                                                handleFilterChange(column.key, e.target.value)
+                                            }
+                                            sx={{ mt: 1 }}
+                                        />
+                                    )}
+                                </TableCell>
                             ))}
-                            <td>
-                                <button
-                                    className="btn btn-sm btn-primary me-2"
-                                    onClick={() => onEdit(row)}
-                                >
-                                    <FaEdit />
-                                </button>
-                                <button
-                                    className="btn btn-sm btn-danger"
-                                    onClick={() => onDelete(row)}
-                                >
-                                    <FaTrash />
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-            </div>
+                            <TableCell sx={{ fontWeight: "bold", width: "120px" }}>
+                                Actions
+                            </TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {data.map((row, rowIndex) => (
+                            <TableRow key={rowIndex} hover>
+                                {columns.map((column) => (
+                                    <TableCell key={column.key}>{row[column.key]}</TableCell>
+                                ))}
+                                <TableCell>
+                                    <IconButton color="primary" onClick={() => onEdit(row)}>
+                                        <EditIcon />
+                                    </IconButton>
+                                    <IconButton color="error" onClick={() => onDelete(row)}>
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
 
             {/* Pagination */}
-            <div className="pagination-container d-flex justify-content-between align-items-center mt-3">
-                <div>
-          <span>
-            Page {currentPage} of {totalPages}
-          </span>
-                </div>
-                <div>
-                    <button
-                        className="btn btn-sm btn-secondary me-2"
-                        disabled={currentPage === 1}
-                        onClick={() => handlePageChange(currentPage - 1)}
-                    >
-                        Previous
-                    </button>
-                    <button
-                        className="btn btn-sm btn-secondary"
-                        disabled={currentPage === totalPages}
-                        onClick={() => handlePageChange(currentPage + 1)}
-                    >
-                        Next
-                    </button>
-                </div>
-            </div>
+            <Pagination
+                count={totalPages}
+                page={currentPage}
+                onChange={handlePageChange}
+                color="primary"
+                sx={{ mt: 2, alignSelf: "center" }}
+            />
         </div>
     );
 };

@@ -23,23 +23,23 @@ import AddIcon from "@mui/icons-material/Add";
 
 const Dropdown = ({ options, value, onChange }) => {
   return (
-    <FormControl fullWidth variant="outlined" size="small">
-      <InputLabel>Select</InputLabel>
-      <Select value={value} onChange={(e) => onChange(e.target.value)} label="Select">
-        <MenuItem value="">
-          <em>Select</em>
-        </MenuItem>
-        {options.map((option) => (
-          <MenuItem key={option.key} value={option.key}>
-            {option.value}
+      <FormControl fullWidth variant="outlined" size="small">
+        <InputLabel>Select</InputLabel>
+        <Select value={value} onChange={(e) => onChange(e.target.value)} label="Select">
+          <MenuItem value="">
+            <em>Select</em>
           </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+          {options.map((option) => (
+              <MenuItem key={option.key} value={option.key}>
+                {option.value}
+              </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
   );
 };
 
-const EditableGrid = ({ initialData, columns, onSave, maxHeight = "400px" }) => {
+const EditableGrid = ({ initialData, columns, onSave, maxHeight = "70vh" }) => {
   const [items, setItems] = useState(initialData);
   const [nextId, setNextId] = useState(initialData.length + 1);
 
@@ -68,93 +68,105 @@ const EditableGrid = ({ initialData, columns, onSave, maxHeight = "400px" }) => 
   };
 
   return (
-    <Box sx={{ padding: 2 }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
-        <Typography variant="h5" color="primary">
-          Editable Grid
-        </Typography>
-        <Button variant="contained" color="success" onClick={handleAddRow} startIcon={<AddIcon />}>
-          Add Row
-        </Button>
-      </Box>
-
-      {/* Scrollable Table Container */}
-      <TableContainer component={Paper} sx={{ maxHeight, overflowY: "auto" }}>
-        <Table stickyHeader>
-          <TableHead>
-            <TableRow>
-              {columns.map((column) => (
-                <TableCell key={column.key} align={column.align || "left"}>
-                  {column.label}
-                </TableCell>
-              ))}
-              <TableCell align="center">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {items.map((item) => (
-              <TableRow key={item.id}>
-                {columns.map((column) => (
-                  <TableCell key={column.key} align={column.align || "left"}>
-                    {column.render ? (
-                      column.render(item, (value) => handleChange(item.id, column.key, value))
-                    ) : column.type === "dropdown" ? (
-                      <Dropdown
-                        options={column.options}
-                        value={item[column.key]}
-                        onChange={(val) => handleChange(item.id, column.key, val)}
-                      />
-                    ) : column.type === "checkbox" ? (
-                      <Checkbox
-                        checked={Boolean(item[column.key])}
-                        onChange={(e) => handleChange(item.id, column.key, e.target.checked)}
-                      />
-                    ) : column.type === "radio" ? (
-                      <Checkbox
-                        checked={Boolean(item[column.key])}
-                        onChange={(e) => handleChange(item.id, column.key, e.target.checked)}
-                        color="primary"
-                      />
-                    ) : (
-                      <TextField
-                        type={column.type || "text"}
-                        value={item[column.key]}
-                        onChange={(e) => handleChange(item.id, column.key, e.target.value)}
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                      />
-                    )}
-                  </TableCell>
-                ))}
-                <TableCell align="center">
-                  <Button
-                    variant="contained"
-                    color="error"
-                    size="small"
-                    onClick={() => handleDelete(item.id)}
-                    startIcon={<DeleteIcon />}
-                  >
-                    Delete
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      <Box sx={{ display: "flex", justifyContent: "flex-end", marginTop: 2 }}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => onSave(items)}
-          startIcon={<SaveIcon />}
+      <Box sx={{ padding: 2, display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              width: "100%",
+              maxWidth: "1200px",
+              marginBottom: 2,
+            }}
         >
-          Save
-        </Button>
+          <Typography variant="h5" color="primary">
+            Editable Grid
+          </Typography>
+          <Button variant="contained" color="success" onClick={handleAddRow} startIcon={<AddIcon />}>
+            Add Row
+          </Button>
+        </Box>
+
+        {/* **Fixed TableContainer Overflow Issue** */}
+        <TableContainer
+            component={Paper}
+            sx={{
+              width: "100%",
+              maxWidth: "1200px", // Prevents overflow
+              maxHeight: maxHeight, // Keeps table within screen limits
+              overflowY: "auto", // Allows scrolling instead of overflowing
+            }}
+        >
+          <Table stickyHeader>
+            <TableHead>
+              <TableRow>
+                {columns.map((column) => (
+                    <TableCell key={column.key} align={column.align || "left"}>
+                      {column.label}
+                    </TableCell>
+                ))}
+                <TableCell align="center">Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {items.map((item) => (
+                  <TableRow key={item.id}>
+                    {columns.map((column) => (
+                        <TableCell key={column.key} align={column.align || "left"}>
+                          {column.render ? (
+                              column.render(item, (value) => handleChange(item.id, column.key, value))
+                          ) : column.type === "dropdown" ? (
+                              <Dropdown
+                                  options={column.options}
+                                  value={item[column.key]}
+                                  onChange={(val) => handleChange(item.id, column.key, val)}
+                              />
+                          ) : column.type === "checkbox" ? (
+                              <Checkbox
+                                  checked={Boolean(item[column.key])}
+                                  onChange={(e) => handleChange(item.id, column.key, e.target.checked)}
+                              />
+                          ) : column.type === "radio" ? (
+                              <Checkbox
+                                  checked={Boolean(item[column.key])}
+                                  onChange={(e) => handleChange(item.id, column.key, e.target.checked)}
+                                  color="primary"
+                              />
+                          ) : (
+                              <TextField
+                                  type={column.type || "text"}
+                                  value={item[column.key]}
+                                  onChange={(e) => handleChange(item.id, column.key, e.target.value)}
+                                  variant="outlined"
+                                  size="small"
+                                  fullWidth
+                              />
+                          )}
+                        </TableCell>
+                    ))}
+                    <TableCell align="center">
+                      <Button
+                          variant="contained"
+                          color="error"
+                          size="small"
+                          onClick={() => handleDelete(item.id)}
+                          startIcon={<DeleteIcon />}
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        <Box sx={{ display: "flex", justifyContent: "flex-end", marginTop: 2, width: "100%", maxWidth: "1200px" }}>
+          <Button variant="contained" color="primary" onClick={() => onSave(items)} startIcon={<SaveIcon />}>
+            Save
+          </Button>
+        </Box>
       </Box>
-    </Box>
   );
 };
 

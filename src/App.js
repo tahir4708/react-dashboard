@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import AuthRoute from "./modules/auth/routes/AuthRoute";
 import Login from "./modules/auth/components/login/Login";
 import Layout from "./layout/layout/Layout";
@@ -15,30 +15,41 @@ const App = () => {
             {/* Public Route for Login */}
             <Route path="/auth/login" element={<Login />} />
 
-            {/* Default Route: Redirect to /dashboard if authenticated, else to /auth/login */}
+            {/* Default Route */}
             <Route
                 path="/"
                 element={<Navigate to={isAuthenticated ? "/dashboard" : "/auth/login"} replace />}
             />
 
-            {/* Protected Routes */}
+            {/* Layout wrapper for all authenticated routes */}
             <Route
                 element={
                     <AuthRoute>
-                        <Layout />
+                        <Layout>
+                            <Outlet /> {/* This renders the child routes */}
+                        </Layout>
                     </AuthRoute>
                 }
             >
+                {/* Protected Routes */}
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/sales" element={<Sales />} />
                 <Route path="/sales/orders/sale-order" element={<SaleOrder />} />
-            </Route>
 
-            {/* Catch-all Route: Redirect to /dashboard or /auth/login */}
-            <Route
-                path="*"
-                element={<Navigate to={isAuthenticated ? "/dashboard" : "/auth/login"} replace />}
-            />
+                {/* Catch-all Route WITH Layout */}
+                <Route
+                    path="*"
+                    element={
+                        isAuthenticated ? (
+                            <div style={{ flex: 1 }}>
+                                {/* Empty content but keeps layout */}
+                            </div>
+                        ) : (
+                            <Navigate to="/auth/login" replace />
+                        )
+                    }
+                />
+            </Route>
         </Routes>
     );
 };
