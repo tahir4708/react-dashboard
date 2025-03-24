@@ -1,0 +1,79 @@
+﻿/* EditableGrid.css */
+.editable-grid-container {
+    max-width: 900px;
+    background: var(--background-color);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px var(--shadow-color);
+}
+
+.table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.table-container {
+    width: 100%;
+    border: 1px solid var(--primary-color);
+    border-radius: 5px;
+    overflow-y: auto;
+}
+
+/* Ensures table headers remain visible when scrolling */
+.table-container thead th {
+    position: sticky;
+    top: 0;
+    background: var(--primary-color);
+    color: var(--text-color);
+    z-index: 10;
+}
+
+.table th {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    padding: 12px;
+    text-transform: uppercase;
+}
+
+.table td {
+    vertical-align: middle;
+    padding: 10px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--secondary-color);
+}
+
+.form-control {
+    border-radius: 5px;
+    padding: 5px 10px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid var(--primary-color);
+}
+
+.btn {
+    font-size: 14px;
+    border-radius: 5px;
+}
+
+.btn-success {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-primary {
+    background-color: var(--hover-color);
+    border-color: var(--hover-color);
+}
+
+.btn i {
+    margin-right: 5px;
+}

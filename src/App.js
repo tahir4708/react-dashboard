@@ -1,49 +1,57 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import AuthRoute from "./modules/auth/routes/AuthRoute";
 import Login from "./modules/auth/components/login/Login";
 import Layout from "./layout/layout/Layout";
 import Sales from "./modules/sales/Sales";
 import SaleOrder from "./modules/sales/sale-order/SaleOrder";
+import Dashboard from "./modules/dashboard/dashboard";
 
 const App = () => {
-  debugger;
-  const isAuthenticated = !!sessionStorage.getItem("authToken");
+    const isAuthenticated = !!sessionStorage.getItem("authToken");
 
-  return (
-    <Routes>
-      {/* Public Route for Login */}
-      <Route path="/auth/login" element={<Login />} />
+    return (
+        <Routes>
+            {/* Public Route for Login */}
+            <Route path="/auth/login" element={<Login />} />
 
-      {/* Default Route: Redirect to /sales if authenticated, else to /auth/login */}
-      <Route
-        path="/"
-        element={
-          <Navigate to={isAuthenticated ? "/sales" : "/auth/login"} replace />
-        }
-      />
+            {/* Default Route */}
+            <Route
+                path="/"
+                element={<Navigate to={isAuthenticated ? "/dashboard" : "/auth/login"} replace />}
+            />
 
-      {/* Protected Routes */}
-      <Route
-        element={
-          <AuthRoute>
-            <Layout />
-          </AuthRoute>
-        }
-      >
-        <Route path="/sales" element={<Sales />} />
-        <Route path="/sales/orders/sale-order" element={<SaleOrder />} />
-      </Route>
+            {/* Layout wrapper for all authenticated routes */}
+            <Route
+                element={
+                    <AuthRoute>
+                        <Layout>
+                            <Outlet /> {/* This renders the child routes */}
+                        </Layout>
+                    </AuthRoute>
+                }
+            >
+                {/* Protected Routes */}
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/sales" element={<Sales />} />
+                <Route path="/sales/orders/sale-order" element={<SaleOrder />} />
 
-      {/* Catch-all Route: Redirect to /sales or /auth/login */}
-      <Route
-        path="*"
-        element={
-          <Navigate to={isAuthenticated ? "/sales" : "/auth/login"} replace />
-        }
-      />
-    </Routes>
-  );
+                {/* Catch-all Route WITH Layout */}
+                <Route
+                    path="*"
+                    element={
+                        isAuthenticated ? (
+                            <div style={{ flex: 1 }}>
+                                {/* Empty content but keeps layout */}
+                            </div>
+                        ) : (
+                            <Navigate to="/auth/login" replace />
+                        )
+                    }
+                />
+            </Route>
+        </Routes>
+    );
 };
 
 export default App;
